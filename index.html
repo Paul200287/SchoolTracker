@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Schoolboard • Wetter • Uhr • Fortschritt</title>
+<style>
+  :root{
+    --bg: #0b1020;
+    --card: #121a34;
+    --text: #e9eefc;
+    --muted:#9fb0da;
+    --accent:#6ea8fe;
+    --good:#2ecc71;
+    --warn:#f1c40f;
+    --bad:#e74c3c;
+    --ring:#7aa2ff;
+  }
+  .light {
+    --bg:#f6f8ff;
+    --card:#ffffff;
+    --text:#0f172a;
+    --muted:#50628f;
+    --accent:#3b82f6;
+    --good:#0fa968;
+    --warn:#b58900;
+    --bad:#c0392b;
+    --ring:#3b82f6;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;
+    background: radial-gradient(1200px 800px at 70% -10%, rgba(110,168,254,.15), transparent 60%) , var(--bg);
+    color:var(--text); min-height:100dvh; display:flex; flex-direction:column;
+  }
+  header{
+    display:flex; gap:12px; align-items:center; justify-content:space-between;
+    padding:14px 16px; border-bottom:1px solid rgba(255,255,255,.06);
+    position:sticky; top:0; backdrop-filter:saturate(180%) blur(8px);
+    background:linear-gradient(180deg, rgba(0,0,0,.25), transparent), transparent;
+    z-index:5;
+  }
+  header .brand{font-weight:700; letter-spacing:.2px}
+  header .controls{display:flex; gap:8px; flex-wrap:wrap}
+  .btn, input, select{
+    background:var(--card); color:var(--text); border:1px solid rgba(255,255,255,.08);
+    padding:10px 12px; border-radius:10px; font-size:14px;
+  }
+  .btn{cursor:pointer; transition:.2s transform}
+  .btn:active{transform:scale(.98)}
+  .grid{
+    display:grid; gap:16px; padding:16px; width:100%;
+    grid-template-columns: repeat(12, minmax(0,1fr));
+  }
+  .card{
+    background:var(--card); border:1px solid rgba(255,255,255,.06);
+    border-radius:16px; padding:16px; box-shadow: 0 10px 30px rgba(0,0,0,.20);
+  }
+  .col-3{grid-column: span 3}
+  .col-4{grid-column: span 4}
+  .col-5{grid-column: span 5}
+  .col-6{grid-column: span 6}
+  .col-7{grid-column: span 7}
+  .col-12{grid-column: span 12}
+  @media (max-width: 1100px){ .col-7,.col-6,.col-5,.col-4,.col-3{grid-column: span 12} }
+  .clock{
+    font-size: clamp(44px, 7vw, 112px); line-height:1; font-weight:800; letter-spacing:1px;
+    text-shadow: 0 6px 30px rgba(0,0,0,.25);
+  }
+  .sub{color:var(--muted); font-size:14px}
+  .big{font-size:28px; font-weight:700}
+  .weather-row{display:flex; gap:16px; align-items:center; flex-wrap:wrap}
+  .pill{padding:8px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.03)}
+  .w-emoji{font-size:42px}
+
+  /* Ring (Kreisdiagramm) */
+  .ring-wrap{
+    display:flex; align-items:center; gap:18px; justify-content:center; flex-wrap:wrap;
+  }
+  .ring{
+    --pct: 0; /* 0..1 */
+    width: 220px; height:220px; border-radius:50%;
+    background:
+      conic-gradient(var(--ring) calc(var(--pct)*1turn), rgba(255,255,255,.08) 0);
+    display:grid; place-items:center; position:relative;
+    box-shadow: inset 0 0 0 10px rgba(255,255,255,.06), 0 15px 40px rgba(0,0,0,.25);
+  }
+  .ring::after{
+    content:""; position:absolute; inset:12px; background:var(--card); border-radius:50%;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+  }
+  .ring > .label{
+    position:absolute; text-align:center; font-weight:700; z-index:1;
+  }
+
+  /* Schul-Ring (voll/halb) */
+  .school-ring{
+    --pct: 0; /* 0..1 */
+    width: 200px; height:200px; border-radius:50%;
+    background: conic-gradient(var(--good) calc(var(--pct)*1turn), rgba(255,255,255,.08) 0);
+    display:grid; place-items:center; position:relative;
+    box-shadow: inset 0 0 0 10px rgba(255,255,255,.06), 0 10px 30px rgba(0,0,0,.25);
+    transition: clip-path .3s ease;
+  }
+  .school-ring::after{
+    content:""; position:absolute; inset:12px; background:var(--card); border-radius:50%;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+  }
+  .school-ring > .label{ position:absolute; font-weight:700; text-align:center; z-index:1; }
+  /* Halbkreis-Modus: untere Hälfte ausblenden */
+  .school-ring.semi{
+    clip-path: inset(50% 0 0 0 round 0 0 100px 100px);
+    height: 100px;
+  }
+  .school-ring.semi::after{ inset:12px 12px -88px 12px; }
+
+  /* Animation wenn der Schultag vorbei ist */
+  @keyframes endPulse{
+    0%{ transform:scale(1); }
+    50%{ transform:scale(1.08); }
+    100%{ transform:scale(1); }
+  }
+  .school-ring.end{ animation:endPulse 1s ease 2; }
+
+  /* Jahres-Ring */
+  .year-ring{
+    --pct: 0; /* 0..1 */
+    width: 200px; height:200px; border-radius:50%;
+    background: conic-gradient(var(--accent) calc(var(--pct)*1turn), rgba(255,255,255,.08) 0);
+    display:grid; place-items:center; position:relative;
+    box-shadow: inset 0 0 0 10px rgba(255,255,255,.06), 0 10px 30px rgba(0,0,0,.25);
+  }
+  .year-ring::after{
+    content:""; position:absolute; inset:12px; background:var(--card); border-radius:50%;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+  }
+  .year-ring > .label{ position:absolute; font-weight:700; text-align:center; z-index:1; }
+
+  .two-col{display:grid; grid-template-columns: 1fr 1fr; gap:12px}
+  @media (max-width: 600px){ .two-col{grid-template-columns:1fr} }
+  .tiny{font-size:12px; color:var(--muted)}
+  .city-input{width:220px}
+  footer{padding:16px; color:var(--muted); text-align:center}
+  .link{color:var(--accent); text-decoration:none}
+  .k{color:var(--muted); font-size:12px}
+</style>
+</head>
+<body>
+  <header>
+    <div class="brand">📚 Schoolboard</div>
+    <div class="controls">
+      <input id="cityInput" class="city-input" type="search" placeholder="Stadt suchen … (optional)" />
+      <button class="btn" id="citySearchBtn">Suchen</button>
+      <select id="unitSelect" class="btn">
+        <option value="c">°C</option>
+        <option value="f">°F</option>
+      </select>
+      <button class="btn" id="themeToggle">Dark/Light</button>
+      <button class="btn" id="schoolRingToggle" title="Schulring: Voll/Halb">Ring: Voll/Halb</button>
+    </div>
+  </header>
+
+  <main class="grid">
+    <!-- Uhr + Datum + Location -->
+    <section class="card col-7">
+      <div class="sub" id="dateStr">—</div>
+      <div class="clock" id="clock">--:--:--</div>
+      <div class="weather-row">
+        <div class="w-emoji" id="wxEmoji">⛅️</div>
+        <div>
+          <div class="big"><span id="temp">—</span> <span id="unitLbl">°C</span> · <span id="wxText">—</span></div>
+          <div class="sub">Ort: <strong id="place">—</strong></div>
+        </div>
+        <div class="pill">Gefühlt: <span id="feels">—</span>°</div>
+        <div class="pill">Regenwahrscheinlichkeit: <span id="pop">—</span>%</div>
+        <div class="pill">Wind: <span id="wind">—</span> km/h</div>
+        <div class="pill">LF: <span id="rh">—</span>%</div>
+      </div>
+      <div style="height:10px"></div>
+      <div class="two-col">
+        <div class="k">Max heute</div><div class="k">Min heute</div>
+        <div class="big"><span id="tmax">—</span>°</div>
+        <div class="big"><span id="tmin">—</span>°</div>
+      </div>
+      <div class="two-col" style="margin-top:10px">
+        <div class="k">Sonnenaufgang</div><div class="k">Sonnenuntergang</div>
+        <div class="big" id="sunrise">—</div>
+        <div class="big" id="sunset">—</div>
+      </div>
+    </section>
+
+    <!-- Kreisdiagramm Tagesfortschritt -->
+    <section class="card col-5">
+      <h3 style="margin-top:0">Tagesfortschritt</h3>
+      <div class="ring-wrap">
+        <div class="ring" id="ring">
+          <div class="label">
+            <div id="pctDay" style="font-size:36px">0.00%</div>
+            <div class="sub">vom Tag</div>
+          </div>
+        </div>
+        <div>
+          <div class="k">Vergangene Zeit</div>
+          <div class="big" id="elapsed">—</div>
+          <div class="k" style="margin-top:10px">Rest des Tages</div>
+          <div class="big" id="remaining">—</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Schuleinstellungen + Schul-Ring -->
+    <section class="card col-6">
+      <h3 style="margin-top:0">Schultag</h3>
+      <div class="two-col">
+        <div>
+          <label class="k">Schulstart (heute)</label>
+          <input id="schoolStart" type="time" class="btn" readonly="true"/>
+        </div>
+        <div>
+          <label class="k">Schulende (heute)</label>
+          <input id="schoolEnd" type="time" class="btn" readonly="true"/>
+        </div>
+      </div>
+      <div style="height:10px"></div>
+      <div style="height:10px"></div>
+
+      <div class="k">Schulzeit-Fortschritt</div>
+      <div class="ring-wrap">
+        <div class="school-ring" id="schoolRing">
+          <div class="label">
+            <div id="schoolPct" style="font-size:28px">0.00%</div>
+            <div class="sub">der Schulzeit</div>
+          </div>
+        </div>
+        <div>
+          <div class="k">Schultag beendet in:</div>
+          <div class="big" id="schoolCountdown">—</div>
+          <div class="tiny" id="schoolStatus">—</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Schuljahr-Tracker -->
+    <section class="card col-6">
+      <h3 style="margin-top:0">Schuljahr (08.09 – 30.04)</h3>
+      <div class="ring-wrap">
+        <div class="year-ring" id="yearRing">
+          <div class="label">
+            <div id="yearPct" style="font-size:28px">0.00%</div>
+            <div class="sub">verbleibend</div>
+          </div>
+        </div>
+        <div>
+          <div class="k">Verbleibende Tage</div>
+          <div class="big" id="yearDaysLeft">—</div>
+          <div class="k">Verbleibende Stunden</div>
+          <div class="big" id="yearHoursLeft">—</div>
+          <div class="tiny" id="yearStatus">—</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>Passath'sche School Tracker</footer>
+
+<script>
+/* -------- Utilities -------- */
+const $ = sel => document.querySelector(sel);
+const pad = n => n.toString().padStart(2,'0');
+const fmtHM = d => pad(d.getHours()) + ":" + pad(d.getMinutes());
+const clamp01 = v => Math.max(0, Math.min(1, v));
+const toF = c => (c*9/5)+32;
+const kmh = ms => Math.round(ms * 3.6);
+const HOUR_MS = 3600_000;
+const DAY_MS = 86_400_000;
+
+/* -------- State -------- */
+const state = {
+  unit: localStorage.getItem('unit') || 'c',
+  theme: localStorage.getItem('theme') || 'dark',
+  tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  coords: null,
+  place: null,
+  weather: null,
+  schoolSemi: localStorage.getItem('schoolSemi') === '1',
+  // Custom pro Wochentag (0..6) als "HH:MM-HH:MM"
+  customSchoolTimes: JSON.parse(localStorage.getItem('customSchoolTimes') || '{}')
+};
+
+if(state.theme === 'light') document.body.classList.add('light');
+$('#unitSelect').value = state.unit;
+
+/* -------- Default-Zeiten je Wochentag (Mo–Fr) -------- */
+/* 0=So, 1=Mo, 2=Di, 3=Mi, 4=Do, 5=Fr, 6=Sa */
+const WEEKDAY_SCHOOL = {
+  1: ["08:40","15:45"], // Montag
+  2: ["07:50","14:05"], // Dienstag
+  3: ["07:50","15:45"], // Mittwoch
+  4: ["07:50","13:15"], // Donnerstag
+  5: ["07:50","13:15"]  // Freitag
+};
+
+/* -------- Schuljahr-Zeitraum (hart verdrahtet) --------
+   08.09 (dieses Jahres) bis 30.04 (nächstes Jahres)
+------------------------------------------------------ */
+function getSchoolYearRange(now=new Date()){
+  const y = now.getFullYear();
+  const startThisYear = new Date(y, 8, 8, 0,0,0,0);   // 8. September (Monat 8)
+  const endThisCycle  = new Date(y+1, 3, 30, 23,59,59,999); // 30. April (Monat 3) nächstes Jahr
+
+  if(now >= startThisYear && now <= endThisCycle){
+    return {start: startThisYear, end: endThisCycle};
+  }
+
+  if(now < startThisYear){
+    // Zeitraum des bald beginnenden Schuljahres
+    return {start: startThisYear, end: endThisCycle};
+  }
+
+  // now > endThisCycle (nach 30.04) → nächster Zyklus
+  const startNext = new Date(y+1, 8, 8, 0,0,0,0);
+  const endNext   = new Date(y+2, 3, 30, 23,59,59,999);
+  return {start: startNext, end: endNext};
+}
+
+/* -------- Clock & Day Progress -------- */
+function tick(){
+  const now = new Date();
+  $('#clock').textContent = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+  $('#dateStr').textContent = now.toLocaleDateString('de-DE', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+  // Day progress
+  const start = new Date(now); start.setHours(0,0,0,0);
+  const end = new Date(now); end.setHours(24,0,0,0);
+  const elapsed = now - start;
+  const total = end - start;
+  const pct = clamp01(elapsed/total);
+
+  $('#ring').style.setProperty('--pct', pct);
+  $('#pctDay').textContent = (pct*100).toFixed(2) + '%';
+  $('#elapsed').textContent = msToHHMM(elapsed) + ' h';
+  $('#remaining').textContent = msToHHMM(total - elapsed) + ' h';
+
+  // School progress & countdown
+  updateSchool(now);
+
+  // School year tracker
+  updateSchoolYear(now);
+
+  requestAnimationFrame(()=>{}); // keep UI snappy
+}
+function msToHHMM(ms){
+  const h = Math.floor(ms/3_600_000);
+  const m = Math.floor((ms%3_600_000)/60_000);
+  return `${pad(h)}:${pad(m)}`;
+}
+
+/* -------- School logic (Ring/Countdown/Status) -------- */
+function prefillTodayInputs(){
+  const times = getSchoolTimesForDay(new Date());
+  $('#schoolStart').value = times ? times[0] : '';
+  $('#schoolEnd').value = times ? times[1] : '';
+}
+function getSchoolTimesForDay(date=new Date()){
+  const wd = date.getDay();
+  const custom = state.customSchoolTimes[wd];
+  if(custom && /^[0-2]\d:[0-5]\d-[0-2]\d:[0-5]\d$/.test(custom)){
+    const [s,e] = custom.split('-');
+    return [s,e];
+  }
+  return WEEKDAY_SCHOOL[wd] || null; // Wochenende -> null
+}
+
+function updateSchool(now = new Date()){
+  const ring = $('#schoolRing');
+  const pctLbl = $('#schoolPct');
+
+  // Halbkreis-Modus anwenden
+  ring.classList.toggle('semi', state.schoolSemi);
+
+  const times = getSchoolTimesForDay(now);
+
+  // Wochenende / kein Unterricht
+  if(!times){
+    $('#schoolStatus').textContent = "Heute kein Unterricht";
+    $('#schoolCountdown').textContent = "00:00:00";
+    ring.style.setProperty('--pct', 0);
+    pctLbl.textContent = "0.00%";
+    ring.classList.remove('end');
+    return;
+  }
+
+  // Falls User Inputs heute überschreiben wollen (sichtbar in Inputs)
+  const sStr = $('#schoolStart').value || times[0];
+  const eStr = $('#schoolEnd').value || times[1];
+
+  const [sH,sM] = sStr.split(':').map(Number);
+  const [eH,eM] = eStr.split(':').map(Number);
+
+  const start = new Date(now); start.setHours(sH,sM,0,0);
+  const end   = new Date(now); end.setHours(eH,eM,0,0);
+
+  let status = '';
+  let nextTarget = null;
+  let prog = 0;
+
+  if(end <= start){
+    status = 'Hinweis: Schulende liegt nicht nach Schulstart.';
+  }
+
+  if(now < start){
+    status = 'Noch nicht gestartet';
+    nextTarget = start;
+    prog = 0;
+    ring.classList.remove('end');
+  } else if(now >= start && now <= end){
+    status = 'Unterricht läuft';
+    nextTarget = end;
+    prog = clamp01((now - start) / (end - start));
+    ring.classList.remove('end');
+  } else {
+    status = 'Heute vorbei';
+    nextTarget = new Date(start.getTime() + DAY_MS); // morgen Start
+    prog = 1;
+    if(!ring.classList.contains('end')) ring.classList.add('end'); // kleine Animation
+  }
+
+  // Countdown
+  const diff = Math.max(0, nextTarget - now);
+  const hh = pad(Math.floor(diff/3_600_000));
+  const mm = pad(Math.floor((diff%3_600_000)/60_000));
+  const ss = pad(Math.floor((diff%60_000)/1000));
+  $('#schoolCountdown').textContent = `${hh}:${mm}:${ss}`;
+
+  // Render Ring
+  ring.style.setProperty('--pct', prog);
+  pctLbl.textContent = (prog*100).toFixed(2) + "%";
+  $('#schoolStatus').textContent = `${status} · ${sStr}–${eStr}`;
+}
+
+/* -------- School Year Tracker (08.09 – 30.04) -------- */
+function updateSchoolYear(now=new Date()){
+  const {start, end} = getSchoolYearRange(now);
+  const total = end - start;
+
+  let remaining;
+  if(now < start){
+    remaining = total; // noch nicht begonnen → alles verbleibend
+  } else if(now > end){
+    remaining = 0; // bereits vorbei
+  } else {
+    remaining = end - now; // mitten im Zeitraum
+  }
+
+  const pctRemain = clamp01(remaining / total);
+  const hoursLeft = (remaining / HOUR_MS);
+
+  const daysLeft = Math.ceil(remaining / DAY_MS);
+  $('#yearDaysLeft').textContent = daysLeft.toLocaleString('de-DE') + ' Tage';
+
+  // Render
+  $('#yearRing').style.setProperty('--pct', pctRemain);
+  $('#yearPct').textContent = (pctRemain*100).toFixed(2) + '%';
+  $('#yearHoursLeft').textContent = hoursLeft.toLocaleString('de-DE', {maximumFractionDigits:1, minimumFractionDigits:1}) + ' h';
+
+  const statusText = `Zeitraum: ${fmtDate(start)} – ${fmtDate(end)}`;
+  $('#yearStatus').textContent = statusText;
+}
+function fmtDate(d){
+  const dd = pad(d.getDate());
+  const mm = pad(d.getMonth()+1);
+  const yyyy = d.getFullYear();
+  return `${dd}.${mm}.${yyyy}`;
+}
+
+/* -------- Weather -------- */
+const WX_MAP = {
+  0:['Klar','☀️'], 1:['Überwiegend klar','🌤️'], 2:['Wolkig','⛅️'], 3:['Bedeckt','☁️'],
+  45:['Nebel','🌫️'], 48:['Reifnebel','🌫️'],
+  51:['Niesel leicht','🌦️'], 53:['Niesel','🌦️'], 55:['Niesel stark','🌦️'],
+  61:['Regen leicht','🌧️'], 63:['Regen','🌧️'], 65:['Regen stark','🌧️'],
+  66:['Gefrierender Regen leicht','🌧️'], 67:['Gefrierender Regen stark','🌧️'],
+  71:['Schnee leicht','🌨️'], 73:['Schnee','🌨️'], 75:['Schnee stark','🌨️'],
+  77:['Schneekörner','🌨️'], 80:['Schauer leicht','🌦️'], 81:['Schauer','🌦️'], 82:['Schauer stark','🌧️'],
+  85:['Schneeschauer leicht','🌨️'], 86:['Schneeschauer stark','🌨️'],
+  95:['Gewitter','⛈️'], 96:['Gewitter mit Hagel','⛈️'], 99:['Gewitter mit starkem Hagel','⛈️']
+};
+
+async function getPlaceName(lat, lon){
+  try{
+    const res = await fetch(`https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}&longitude=${lon}&language=de&format=json`);
+    const j = await res.json();
+    const item = j?.results?.[0];
+    return item ? (item.name + (item.country ? ', ' + item.country : '')) : 'Dein Standort';
+  }catch(e){ return 'Dein Standort'; }
+}
+
+async function geocodeCity(name){
+  const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=1&language=de&format=json`;
+  const r = await fetch(url); const j = await r.json();
+  const it = j?.results?.[0];
+  if(!it) throw new Error('Stadt nicht gefunden');
+  return {lat: it.latitude, lon: it.longitude, place: it.name + (it.country ? ', ' + it.country : '')};
+}
+
+async function fetchWeather(lat, lon){
+  const params = new URLSearchParams({
+    latitude: lat, longitude: lon,
+    current: 'temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m',
+    hourly: 'precipitation_probability',
+    daily: 'temperature_2m_max,temperature_2m_min,sunrise,sunset',
+    timezone: 'auto'
+  });
+  const url = `https://api.open-meteo.com/v1/forecast?${params.toString()}`;
+  const res = await fetch(url);
+  if(!res.ok) throw new Error('Wetterdaten nicht verfügbar');
+  return await res.json();
+}
+
+function renderWeather(j){
+  state.weather = j;
+  const c = j.current;
+  const d = j.daily;
+  const unit = state.unit;
+
+  let t = c.temperature_2m;
+  let feels = c.apparent_temperature;
+  let tmax = d.temperature_2m_max[0];
+  let tmin = d.temperature_2m_min[0];
+  if(unit==='f'){ t = toF(t); feels = toF(feels); tmax = toF(tmax); tmin = toF(tmin); }
+
+  const [wxText, emoji] = WX_MAP[c.weather_code] || ['Wetter', '⛅️'];
+  $('#wxText').textContent = wxText;
+  $('#wxEmoji').textContent = emoji;
+  $('#temp').textContent = Math.round(t);
+  $('#unitLbl').textContent = unit === 'c' ? '°C' : '°F';
+  $('#feels').textContent = Math.round(feels);
+  $('#wind').textContent = kmh(c.wind_speed_10m);
+  $('#rh').textContent = Math.round(c.relative_humidity_2m);
+
+  // PoP (nächste Stunde falls vorhanden, sonst Tagesmittel)
+  let pop = null;
+  try{
+    const idx = j.hourly.time.indexOf(new Date(c.time).toISOString().slice(0,13)+":00");
+    pop = idx>=0 ? j.hourly.precipitation_probability[idx] : null;
+  }catch(e){}
+  if(pop==null && j.hourly?.precipitation_probability?.length){
+    const arr = j.hourly.precipitation_probability.slice(0,12).filter(x=>typeof x==='number');
+    pop = Math.round(arr.reduce((a,b)=>a+b,0)/arr.length);
+  }
+  $('#pop').textContent = (pop ?? '—');
+
+  $('#tmax').textContent = Math.round(tmax);
+  $('#tmin').textContent = Math.round(tmin);
+  $('#sunrise').textContent = new Date(d.sunrise[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  $('#sunset').textContent = new Date(d.sunset[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+
+  // dynamischer Hintergrund leicht anpassen (Tag/Nacht)
+  document.body.style.background =
+    (c.is_day ? 'radial-gradient(1200px 800px at 70% -10%, rgba(110,168,254,.15), transparent 60%)' :
+                'radial-gradient(1200px 800px at 70% -10%, rgba(10,12,30,.35), transparent 60%)')
+    + ', ' + getComputedStyle(document.body).getPropertyValue('--bg');
+
+  // Ort / Zeit
+  $('#place').textContent = state.place || '—';
+}
+
+/* -------- Init: Location then Weather -------- */
+async function initLocationAndWeather(){
+  // gespeicherte Stadt verwenden
+  try{
+    const saved = JSON.parse(localStorage.getItem('coords_place')||'null');
+    if(saved){ state.coords = {lat:saved.lat, lon:saved.lon}; state.place = saved.place; }
+  }catch(e){}
+
+  if(!state.coords){
+    // Geolocation
+    try{
+      await new Promise((res, rej)=>{
+        if(!navigator.geolocation) return rej('no geo');
+        navigator.geolocation.getCurrentPosition(
+          pos=>{ state.coords = {lat: pos.coords.latitude, lon: pos.coords.longitude}; res(); },
+          err=>rej(err), {enableHighAccuracy:true, timeout: 8000, maximumAge: 60000}
+        );
+      });
+      state.place = await getPlaceName(state.coords.lat, state.coords.lon);
+    }catch(e){
+      // Fallback: Wien
+      state.coords = {lat:48.2082, lon:16.3738};
+      state.place = 'Wien, Österreich';
+    }
+  }
+
+  const w = await fetchWeather(state.coords.lat, state.coords.lon);
+  renderWeather(w);
+}
+
+$('#unitSelect').addEventListener('change', ()=>{
+  state.unit = $('#unitSelect').value;
+  localStorage.setItem('unit', state.unit);
+  if(state.weather) renderWeather(state.weather);
+});
+
+$('#themeToggle').addEventListener('click', ()=>{
+  const isLight = document.body.classList.toggle('light');
+  state.theme = isLight ? 'light' : 'dark';
+  localStorage.setItem('theme', state.theme);
+});
+
+$('#schoolRingToggle').addEventListener('click', ()=>{
+  state.schoolSemi = !state.schoolSemi;
+  localStorage.setItem('schoolSemi', state.schoolSemi ? '1' : '0');
+  $('#schoolRing').classList.toggle('semi', state.schoolSemi);
+});
+
+$('#citySearchBtn').addEventListener('click', async ()=>{
+  const q = $('#cityInput').value.trim();
+  if(!q) return;
+  try{
+    const {lat, lon, place} = await geocodeCity(q);
+    state.coords = {lat, lon}; state.place = place;
+    localStorage.setItem('coords_place', JSON.stringify({lat, lon, place}));
+    const w = await fetchWeather(lat, lon);
+    renderWeather(w);
+  }catch(e){
+    alert('Stadt nicht gefunden. Bitte erneut versuchen.');
+  }
+});
+$('#cityInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') $('#citySearchBtn').click(); });
+
+/* -------- Start -------- */
+(async function start(){
+  try{
+    await initLocationAndWeather();
+  }catch(e){ console.error(e); }
+  prefillTodayInputs();
+  tick();
+  setInterval(tick, 1000);
+  // Wetter alle 10 Min aktualisieren
+  setInterval(async ()=>{
+    try{
+      const w = await fetchWeather(state.coords.lat, state.coords.lon);
+      renderWeather(w);
+    }catch(e){}
+  }, 600_000);
+})();
+</script>
+</body>
+</html>
