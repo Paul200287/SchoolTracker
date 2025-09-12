@@ -1,0 +1,482 @@
+[(datetime.time(7,
+    50),
+    [(datetime.date(2025,
+        9,
+        8),
+        {PeriodObject({'id': 3427029, 'date': 20250908, 'startTime': 750, 'endTime': 840, 'code': 'irregular', 'kl': [
+                    {'id': 1921
+                    }
+                ], 'te': [
+                    {'id': 453
+                    }
+                ], 'su': [], 'ro': [], 'lstext': 'KV', 'lsnumber': 24795, 'substText': 'KV'
+            })
+        }), (datetime.date(2025,
+        9,
+        9), set()), (datetime.date(2025,
+        9,
+        10),
+        {PeriodObject({'id': 3678729, 'date': 20250910, 'startTime': 750, 'endTime': 840, 'kl': [
+                    {'id': 1921
+                    }
+                ], 'te': [
+                    {'id': 313
+                    }
+                ], 'su': [
+                    {'id': 558
+                    }
+                ], 'ro': [
+                    {'id': 430
+                    }
+                ], 'lsnumber': 444800, 'sg': 'SYT_5AHIT_4', 'activityType': 'Unterricht'
+            })
+        }), (datetime.date(2025,
+        9,
+        11),
+        {PeriodObject({'id': 3665221, 'date': 20250911, 'startTime': 750, 'endTime': 840, 'kl': [
+                    {'id': 1921
+                    }
+                ], 'te': [
+                    {'id': 347
+                    }
+                ], 'su': [
+                    {'id': 594
+                    }
+                ], 'ro': [
+                    {'id': 430
+                    }
+                ], 'lsnumber': 444700, 'sg': 'INSY_5AHIT_1', 'activityType': 'Unterricht'
+            })
+        }), (datetime.date(2025,
+        9,
+        12),
+        {PeriodObject({'id': 3436838, 'date': 20250912, 'startTime': 750, 'endTime': 840, 'kl': [
+                    {'id': 1921
+                    }
+                ], 'te': [
+                    {'id': 59
+                    }
+                ], 'su': [
+                    {'id': 4
+                    }
+                ], 'ro': [
+                    {'id': 430
+                    }
+                ], 'lsnumber': 444100, 'sg': 'D_5AHIT', 'activityType': 'Unterricht'
+            })
+        })
+    ]), (datetime.time(8,
+    40),
+    [(datetime.date(2025,
+        9,
+        8),
+        {PeriodObject({'id': 3427119, 'date': 20250908, 'startTime': 840, 'endTime': 930, 'code': 'irregular', 'kl': [
+                    {'id': 1921
+                    }
+                ], 'te': [
+                    {'id': 453
+                    }
+                ], 'su': [], 'ro': [], 'lstext': 'KV', 'lsnumber': 24895, 'substText': 'KV'
+            })
+        }), (datetime.date(2025,
+        9,
+        9), set()), (datetime.date(2025,
+        9,
+        10),
+        {PeriodObject({'id': 3639235, 'date': 20250910, 'startTime': 840, 'endTime': 930, 'kl': [
+                    {'id': 1921
+                    }
+                ], 'te': [
+                    {'id': 313
+                    }
+                ], 'su': [
+                    {'id': 558
+                    }
+                ], 'ro': [
+                    {'id': 430
+                    }
+                ], 'lsnumber': 444800, 'sg': 'SYT_5AHIT_4', 'activityType': 'Unterricht'
+            })
+        }), (datetime.date(2025,
+        9,
+        11),
+        {PeriodObject({'id': 3675469, 'date': 20250911, 'startTime': 840, 'endTime': 930, 'kl': [
+                    {'id': 1921
+                    }
+                ], 'te': [
+                    {'id': 347
+                    }
+                ], 'su': [
+                    {'id': 721
+                    }
+                ], 'ro': [
+                    {'id': 430
+                    }
+                ], 'lsnumber': 445000, 'sg': 'CCIT_1_5AHIT_1', 'activityType': 'Unterricht'
+            })
+        }), (datetime.date(2025,
+        9,
+        12),
+        {PeriodObject({'id': 3551501, 'date': 20250912, 'startTime': 840, 'endTime': 930, 'kl': [
+                    {'id': 1921
+                    }
+                ], 'te': [
+                    {'id': 10
+                    }
+                ], 'su': [
+                    {'id': 510
+                    }
+                ], 'ro': [
+                    {'id': 430
+                    }
+                ], 'lsnumber': 495800, 'sg': 'E1_5AHIT_1', 'activityType': 'Unterricht'
+            })
+        })
+    ]), (datetime.time(9,
+    45),
+    [(datetime.date(2025,
+        9,
+        8),
+        {PeriodObject({'id': 3678816, 'date': 20250908, 'startTime': 945, 'endTime': 1035, 'kl': [
+                    {'id': 1921
+                    }
+                ], 'te': [
+                    {'id': 453
+                    }
+                ], 'su': [
+                    {'id': 589
+                    }
+                ], 'ro': [
+                    {'id': 430
+                    }
+                ], 'lstext': 'Informatik', 'lsnumber': 444600, 'sg': 'ITP2_5AHIT_Info', 'activityType': 'Unterricht'
+            })
+        }), (datetime.date(2025,
+        9,
+        9), set()), (datetime.date(2025,
+        9,
+        10),
+        {PeriodObject({'id': 3565078, 'date': 20250910, 'startTime': 945, 'endTime': 1035, 'kl': [
+                    {'id': 1921
+                    }
+                ], 'te': [
+                    {'id': 29
+                    }
+                ], 'su': [
+                    {'id': 514
+                    }
+                ], 'ro': [
+                    {'id': 430
+                    }
+                ], 'lsnumber': 444300, 'sg': 'WIR_3_5AHIT', 'activityType': 'Unterricht'
+            })
+        }), (datetime.date(2025,
+        9,
+        11), set()), (datetime.date(2025,
+        9,
+        12),
+        {PeriodObject({'id': 3665389, 'date': 20250912, 'startTime': 945, 'endTime': 1035, 'kl': [
+                    {'id': 1921
+                    }
+                ], 'te': [
+                    {'id': 313
+                    },
+                    {'id': 347
+                    }
+                ], 'su': [
+                    {'id': 594
+                    }
+                ], 'ro': [
+                    {'id': 430
+                    }
+                ], 'lsnumber': 496300, 'sg': 'INSY_5AHIT', 'activityType': 'Unterricht'
+            })
+        })
+    ]), (datetime.time(10,
+    35),
+    [(datetime.date(2025,
+        9,
+        8),
+        {PeriodObject({'id': 3436835, 'date': 20250908, 'startTime': 1035, 'endTime': 1125, 'kl': [
+                    {'id': 1921
+                    }
+                ], 'te': [
+                    {'id': 59
+                    }
+                ], 'su': [
+                    {'id': 4
+                    }
+                ], 'ro': [
+                    {'id': 430
+                    }
+                ], 'lsnumber': 444100, 'sg': 'D_5AHIT', 'activityType': 'Unterricht'
+            })
+        }), (datetime.date(2025,
+        9,
+        9), set()), (datetime.date(2025,
+        9,
+        10),
+        {PeriodObject({'id': 3565081, 'date': 20250910, 'startTime': 1035, 'endTime': 1125, 'kl': [
+                    {'id': 1921
+                    }
+                ], 'te': [
+                    {'id': 29
+                    }
+                ], 'su': [
+                    {'id': 514
+                    }
+                ], 'ro': [
+                    {'id': 430
+                    }
+                ], 'lsnumber': 444300, 'sg': 'WIR_3_5AHIT', 'activityType': 'Unterricht'
+            })
+        }), (datetime.date(2025,
+        9,
+        11), set()), (datetime.date(2025,
+        9,
+        12),
+        {PeriodObject({'id': 3665392, 'date': 20250912, 'startTime': 1035, 'endTime': 1125, 'kl': [
+                    {'id': 1921
+                    }
+                ], 'te': [
+                    {'id': 313
+                    },
+                    {'id': 347
+                    }
+                ], 'su': [
+                    {'id': 594
+                    }
+                ], 'ro': [
+                    {'id': 430
+                    }
+                ], 'lsnumber': 496300, 'sg': 'INSY_5AHIT', 'activityType': 'Unterricht'
+            })
+        })
+    ]), (datetime.time(11,
+    35),
+    [(datetime.date(2025,
+        9,
+        8),
+        {PeriodObject({'id': 3637435, 'date': 20250908, 'startTime': 1135, 'endTime': 1225, 'code': 'cancelled', 'kl': [
+                    {'id': 1921
+                    }
+                ], 'te': [
+                    {'id': 237
+                    },
+                    {'id': 313
+                    }
+                ], 'su': [
+                    {'id': 557
+                    }
+                ], 'ro': [
+                    {'id': 430
+                    }
+                ], 'lsnumber': 172300, 'sg': 'SEW_5AHIT', 'activityType': 'Unterricht'
+            })
+        }), (datetime.date(2025,
+        9,
+        9),
+        {PeriodObject({'id': 3551498, 'date': 20250909, 'startTime': 1135, 'endTime': 1225, 'kl': [
+                    {'id': 1921
+                    }
+                ], 'te': [
+                    {'id': 10
+                    }
+                ], 'su': [
+                    {'id': 510
+                    }
+                ], 'ro': [
+                    {'id': 430
+                    }
+                ], 'lsnumber': 495800, 'sg': 'E1_5AHIT_1', 'activityType': 'Unterricht'
+            })
+        }), (datetime.date(2025,
+        9,
+        10), set()), (datetime.date(2025,
+        9,
+        11), set()), (datetime.date(2025,
+        9,
+        12), set())
+    ]), (datetime.time(12,
+    25),
+    [(datetime.date(2025,
+        9,
+        8),
+        {PeriodObject({'id': 3637438, 'date': 20250908, 'startTime': 1225, 'endTime': 1315, 'code': 'cancelled', 'kl': [
+                    {'id': 1921
+                    }
+                ], 'te': [
+                    {'id': 237
+                    },
+                    {'id': 313
+                    }
+                ], 'su': [
+                    {'id': 557
+                    }
+                ], 'ro': [
+                    {'id': 430
+                    }
+                ], 'lsnumber': 172300, 'sg': 'SEW_5AHIT', 'activityType': 'Unterricht'
+            })
+        }), (datetime.date(2025,
+        9,
+        9),
+        {PeriodObject({'id': 3663470, 'date': 20250909, 'startTime': 1225, 'endTime': 1315, 'code': 'cancelled', 'kl': [
+                    {'id': 1921
+                    }
+                ], 'te': [
+                    {'id': 34
+                    }
+                ], 'su': [
+                    {'id': 589
+                    }
+                ], 'ro': [
+                    {'id': 430
+                    }
+                ], 'lstext': 'Wirtschaft', 'lsnumber': 496200, 'sg': 'ITP2_5AHIT_WI', 'activityType': 'Unterricht'
+            })
+        }), (datetime.date(2025,
+        9,
+        10), set()), (datetime.date(2025,
+        9,
+        11), set()), (datetime.date(2025,
+        9,
+        12), set())
+    ]), (datetime.time(13,
+    15),
+    [(datetime.date(2025,
+        9,
+        8), set()), (datetime.date(2025,
+        9,
+        9),
+        {PeriodObject({'id': 3665218, 'date': 20250909, 'startTime': 1315, 'endTime': 1405, 'code': 'cancelled', 'kl': [
+                    {'id': 1921
+                    }
+                ], 'te': [
+                    {'id': 347
+                    }
+                ], 'su': [
+                    {'id': 594
+                    }
+                ], 'ro': [
+                    {'id': 430
+                    }
+                ], 'lsnumber': 444700, 'sg': 'INSY_5AHIT_1', 'activityType': 'Unterricht'
+            })
+        }), (datetime.date(2025,
+        9,
+        10), set()), (datetime.date(2025,
+        9,
+        11), set()), (datetime.date(2025,
+        9,
+        12), set())
+    ]), (datetime.time(14,
+    5),
+    [(datetime.date(2025,
+        9,
+        8), set()), (datetime.date(2025,
+        9,
+        9), set()), (datetime.date(2025,
+        9,
+        10),
+        {PeriodObject({'id': 3639832, 'date': 20250910, 'startTime': 1405, 'endTime': 1455, 'kl': [
+                    {'id': 1921
+                    }
+                ], 'te': [
+                    {'id': 113
+                    }
+                ], 'su': [
+                    {'id': 558
+                    }
+                ], 'ro': [
+                    {'id': 358
+                    }
+                ], 'lsnumber': 496100, 'sg': 'SYT_5AHIT_3', 'activityType': 'Unterricht'
+            }), PeriodObject({'id': 3639658, 'date': 20250910, 'startTime': 1405, 'endTime': 1455, 'kl': [
+                    {'id': 1921
+                    }
+                ], 'te': [
+                    {'id': 236
+                    }
+                ], 'su': [
+                    {'id': 558
+                    }
+                ], 'ro': [
+                    {'id': 358
+                    }
+                ], 'lsnumber': 496000, 'sg': 'SYT_5AHIT_2', 'activityType': 'Unterricht'
+            }), PeriodObject({'id': 3639484, 'date': 20250910, 'startTime': 1405, 'endTime': 1455, 'kl': [
+                    {'id': 1921
+                    }
+                ], 'te': [
+                    {'id': 313
+                    }
+                ], 'su': [
+                    {'id': 558
+                    }
+                ], 'ro': [
+                    {'id': 430
+                    }
+                ], 'lsnumber': 495900, 'sg': 'SYT_5AHIT_1', 'activityType': 'Unterricht'
+            })
+        }), (datetime.date(2025,
+        9,
+        11), set()), (datetime.date(2025,
+        9,
+        12), set())
+    ]), (datetime.time(14,
+    55),
+    [(datetime.date(2025,
+        9,
+        8), set()), (datetime.date(2025,
+        9,
+        9), set()), (datetime.date(2025,
+        9,
+        10),
+        {PeriodObject({'id': 3678500, 'date': 20250910, 'startTime': 1455, 'endTime': 1545, 'kl': [
+                    {'id': 1921
+                    }
+                ], 'te': [
+                    {'id': 113
+                    }
+                ], 'su': [
+                    {'id': 558
+                    }
+                ], 'ro': [
+                    {'id': 358
+                    }
+                ], 'lsnumber': 496100, 'sg': 'SYT_5AHIT_3', 'activityType': 'Unterricht'
+            }), PeriodObject({'id': 3678413, 'date': 20250910, 'startTime': 1455, 'endTime': 1545, 'kl': [
+                    {'id': 1921
+                    }
+                ], 'te': [
+                    {'id': 236
+                    }
+                ], 'su': [
+                    {'id': 558
+                    }
+                ], 'ro': [
+                    {'id': 358
+                    }
+                ], 'lsnumber': 496000, 'sg': 'SYT_5AHIT_2', 'activityType': 'Unterricht'
+            }), PeriodObject({'id': 3678326, 'date': 20250910, 'startTime': 1455, 'endTime': 1545, 'kl': [
+                    {'id': 1921
+                    }
+                ], 'te': [
+                    {'id': 313
+                    }
+                ], 'su': [
+                    {'id': 558
+                    }
+                ], 'ro': [
+                    {'id': 430
+                    }
+                ], 'lsnumber': 495900, 'sg': 'SYT_5AHIT_1', 'activityType': 'Unterricht'
+            })
+        }), (datetime.date(2025,
+        9,
+        11), set()), (datetime.date(2025,
+        9,
+        12), set())
+    ])
+]

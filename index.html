@@ -73,24 +73,13 @@
   .pill{padding:8px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.03)}
   .w-emoji{font-size:42px}
 
+  .monospace-digits {
+    font-variant-numeric: tabular-nums;
+  }
+
   /* Ring (Kreisdiagramm) */
   .ring-wrap{
     display:flex; align-items:center; gap:18px; justify-content:center; flex-wrap:wrap;
-  }
-  .ring{
-    --pct: 0; /* 0..1 */
-    width: 220px; height:220px; border-radius:50%;
-    background:
-      conic-gradient(var(--ring) calc(var(--pct)*1turn), rgba(255,255,255,.08) 0);
-    display:grid; place-items:center; position:relative;
-    box-shadow: inset 0 0 0 10px rgba(255,255,255,.06), 0 15px 40px rgba(0,0,0,.25);
-  }
-  .ring::after{
-    content:""; position:absolute; inset:12px; background:var(--card); border-radius:50%;
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
-  }
-  .ring > .label{
-    position:absolute; text-align:center; font-weight:700; z-index:1;
   }
 
   /* Schul-Ring (voll/halb) */
@@ -162,9 +151,9 @@
 
   <main class="grid">
     <!-- Uhr + Datum + Location -->
-    <section class="card col-7">
+    <section class="card col-12">
       <div class="sub" id="dateStr">—</div>
-      <div class="clock" id="clock">--:--:--</div>
+      <div class="clock monospace-digits" id="clock">--:--:--</div>
       <div class="weather-row">
         <div class="w-emoji" id="wxEmoji">⛅️</div>
         <div>
@@ -189,25 +178,6 @@
       </div>
     </section>
 
-    <!-- Kreisdiagramm Tagesfortschritt -->
-    <section class="card col-5">
-      <h3 style="margin-top:0">Tagesfortschritt</h3>
-      <div class="ring-wrap">
-        <div class="ring" id="ring">
-          <div class="label">
-            <div id="pctDay" style="font-size:36px">0.00%</div>
-            <div class="sub">vom Tag</div>
-          </div>
-        </div>
-        <div>
-          <div class="k">Vergangene Zeit</div>
-          <div class="big" id="elapsed">—</div>
-          <div class="k" style="margin-top:10px">Rest des Tages</div>
-          <div class="big" id="remaining">—</div>
-        </div>
-      </div>
-    </section>
-
     <!-- Schuleinstellungen + Schul-Ring -->
     <section class="card col-6">
       <h3 style="margin-top:0">Schultag</h3>
@@ -228,13 +198,13 @@
       <div class="ring-wrap">
         <div class="school-ring" id="schoolRing">
           <div class="label">
-            <div id="schoolPct" style="font-size:28px">0.00%</div>
-            <div class="sub">der Schulzeit</div>
+            <div id="schoolPct" class="monospace-digits" style="font-size:28px">0.00%</div>
+            <div class="sub">verbleibend</div>
           </div>
         </div>
         <div>
-          <div class="k">Schultag beendet in:</div>
-          <div class="big" id="schoolCountdown">—</div>
+          <div class="k" id="schoolCountdownLabel">Schultag beendet in:</div>
+          <div class="big monospace-digits" id="schoolCountdown">—</div>
           <div class="tiny" id="schoolStatus">—</div>
         </div>
       </div>
@@ -246,15 +216,15 @@
       <div class="ring-wrap">
         <div class="year-ring" id="yearRing">
           <div class="label">
-            <div id="yearPct" style="font-size:28px">0.00%</div>
+            <div id="yearPct" class="monospace-digits" style="font-size:28px">0.00%</div>
             <div class="sub">verbleibend</div>
           </div>
         </div>
         <div>
           <div class="k">Verbleibende Tage</div>
-          <div class="big" id="yearDaysLeft">—</div>
+          <div class="big monospace-digits" id="yearDaysLeft">—</div>
           <div class="k">Verbleibende Stunden</div>
-          <div class="big" id="yearHoursLeft">—</div>
+          <div class="big monospace-digits" id="yearHoursLeft">—</div>
           <div class="tiny" id="yearStatus">—</div>
         </div>
       </div>
@@ -329,18 +299,6 @@ function tick(){
   $('#clock').textContent = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
   $('#dateStr').textContent = now.toLocaleDateString('de-DE', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 
-  // Day progress
-  const start = new Date(now); start.setHours(0,0,0,0);
-  const end = new Date(now); end.setHours(24,0,0,0);
-  const elapsed = now - start;
-  const total = end - start;
-  const pct = clamp01(elapsed/total);
-
-  $('#ring').style.setProperty('--pct', pct);
-  $('#pctDay').textContent = (pct*100).toFixed(2) + '%';
-  $('#elapsed').textContent = msToHHMM(elapsed) + ' h';
-  $('#remaining').textContent = msToHHMM(total - elapsed) + ' h';
-
   // School progress & countdown
   updateSchool(now);
 
@@ -403,6 +361,7 @@ function updateSchool(now = new Date()){
   let status = '';
   let nextTarget = null;
   let prog = 0;
+  const countdownLabel = $('#schoolCountdownLabel');
 
   if(end <= start){
     status = 'Hinweis: Schulende liegt nicht nach Schulstart.';
@@ -411,18 +370,21 @@ function updateSchool(now = new Date()){
   if(now < start){
     status = 'Noch nicht gestartet';
     nextTarget = start;
-    prog = 0;
+    prog = 1; // Full ring before start
     ring.classList.remove('end');
+    countdownLabel.textContent = 'Schultag beginnt in:';
   } else if(now >= start && now <= end){
     status = 'Unterricht läuft';
     nextTarget = end;
-    prog = clamp01((now - start) / (end - start));
+    prog = clamp01((end - now) / (end - start)); // Countdown progress
     ring.classList.remove('end');
+    countdownLabel.textContent = 'Schultag beendet in:';
   } else {
     status = 'Heute vorbei';
     nextTarget = new Date(start.getTime() + DAY_MS); // morgen Start
-    prog = 1;
+    prog = 0; // Empty ring after end
     if(!ring.classList.contains('end')) ring.classList.add('end'); // kleine Animation
+    countdownLabel.textContent = 'Nächster Schultag in:';
   }
 
   // Countdown
