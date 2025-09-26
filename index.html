@@ -28,10 +28,23 @@
     --ring:#3b82f6;
   }
   *{box-sizing:border-box}
-  body{
-    margin:0; font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;
-    background: radial-gradient(1200px 800px at 70% -10%, rgba(110,168,254,.15), transparent 60%) , var(--bg);
-    color:var(--text); min-height:100dvh; display:flex; flex-direction:column;
+  body {
+    font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;
+    background: radial-gradient(1200px 800px at 70% -10%, rgba(110,168,254,.15), transparent 60%), var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+  }
+  main {
+    flex: 1;       /* takes up all space between header and footer */
+    overflow: auto; /* scroll inside if needed */
+  }
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100dvw;
+    height: 100dvh;
+    overflow: hidden; /* prevent accidental scrollbars */
   }
   header{
     display:flex; gap:12px; align-items:center; justify-content:space-between;
